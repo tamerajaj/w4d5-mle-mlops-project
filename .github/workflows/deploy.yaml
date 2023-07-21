@@ -112,7 +112,7 @@ jobs:
 
         - name: 'Replace INTERNAL_IP in prometheus.yml'
           run: |
-            sed -i '' -e "s/INTERNAL_IP/$INTERNAL_IP/" prometheus.yml
+            sed -i '' -e "s/INTERNAL_IP/$INTERNAL_IP/" deployment/prometheus_deployment/prometheus/prometheus.yml
 
         - name: 'Docker build - prometheus'
           env:
