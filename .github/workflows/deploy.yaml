@@ -111,8 +111,10 @@ jobs:
             cp deployment/prometheus_deployment/prometheus/prometheus.yml.template deployment/prometheus_deployment/prometheus/prometheus.yml
 
         - name: 'Replace INTERNAL_IP in prometheus.yml'
+          id: replace_internal_ip
           run: |
-            sed -i '' -e "s/INTERNAL_IP/$INTERNAL_IP/" prometheus.yml
+            sed -i '' -e "s/INTERNAL_IP/$INTERNAL_IP/" deployment/prometheus_deployment/prometheus/prometheus.yml
+
 
         - name: 'Docker build - prometheus'
           env:
@@ -122,11 +124,13 @@ jobs:
             docker build \
               --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest" \
               $DOCKERFILE_PATH
+            echo "::set-output name=docker_build_status::success"
 
         - name: 'Docker push - prometheus'
           run: |
             docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/prometheus:latest"
 
         - name: 'Remove modified prometheus.yml'
+          if: steps.replace_internal_ip.outcome == 'success' && steps.docker_build.outputs.docker_build_status == 'success'
           run: |
             rm deployment/prometheus_deployment/prometheus/prometheus.yml
