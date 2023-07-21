@@ -51,6 +51,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug File Structure
+        run: ls -R deployment/
+
+      - name: Debug Template File
+        run: cat deployment/prometheus_deployment/prometheus/prometheus.yml.template
+
       - name: Checkout
         uses: actions/checkout@v3
 
