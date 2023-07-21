@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import argparse
 import os
 
 import mlflow
@@ -94,10 +95,15 @@ def train_model(df):
         lr.fit(X_train, y_train)
         print("Model training completed")
 
+        y_pred_train = lr.predict(X_train)
+        rmse_train = mean_squared_error(y_train, y_pred_train, squared=False)
+        mlflow.log_metric("rmse train", rmse_train)
+        print(f"RMSE Train: {rmse_train:.2f}")
+
         y_pred = lr.predict(X_test)
-        rmse = mean_squared_error(y_test, y_pred, squared=False)
-        print(f"RMSE: {rmse:.2f}")
-        mlflow.log_metric("rmse", rmse)
+        rmse_test = mean_squared_error(y_test, y_pred, squared=False)
+        print(f"RMSE Test: {rmse_test:.2f}")
+        mlflow.log_metric("rmse test", rmse_test)
 
         mlflow.sklearn.log_model(lr, "model")
         run_id = mlflow.active_run().info.run_id
@@ -114,12 +120,24 @@ def train_model(df):
             stage=new_stage,
             archive_existing_versions=False,
         )
+    return rmse_train, rmse_test
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--cml_run", default=False, action=argparse.BooleanOptionalAction, required=True
+    )
+    args = parser.parse_args()
+    cml_run = args.cml_run
+
     year = 2021
     month = 2
     color = "green"
     download_data(year, month, color)
     df = pd.read_parquet(f"./data/{color}_tripdata_{year}-{month:02d}.parquet")
-    train_model(df)
+    rmse_train, rmse_test = train_model(df)
+    if cml_run:
+        with open("metrics.txt", "w") as f:
+            f.write(f"RMSE on the Train Set: {rmse_train}")
+            f.write(f"RMSE on the Test Set: {rmse_test}")
