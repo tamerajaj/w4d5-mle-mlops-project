@@ -1,0 +1,29 @@
+name: CML
+on: 
+    pull_request:
+        branches: 
+            - main
+jobs:
+  train-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: iterative/setup-cml@v1
+      - name: Train model
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" | base64 --decode | jq > credentials.json
+          pip install -r requirements.txt
+          echo "Pulling data from GCS..."
+          dvc remote modify --local myremote \
+                    credentialpath './credentials.json'
+          dvc pull
+          echo "Training model..."
+          python src/train.py --cml_run
+          cat metrics.txt >> report.md
+          echo '![](./residuals.png "Residual Plot")' >> report.md
+          cml comment create report.md 
+          rm credentials.json
