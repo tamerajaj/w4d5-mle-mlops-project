@@ -11,15 +11,15 @@ env:
   REPOSITORY: ${{ secrets.REPOSITORY }}
 
 jobs:
-  login-build-push:
-    name: Docker login, build, and push
+  login-build-push-ml-webservice:
+    name: Docker login, build, and push - ml-webservice
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
+
+      - name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
@@ -32,7 +32,7 @@ jobs:
           username: 'oauth2accesstoken'
           password: '${{ steps.auth.outputs.access_token }}'
 
-      - name: 'Docker build and push - ml-webservice'
+      - name: 'Docker build - ml-webservice'
         env:
           IMAGE: ml-webservice
           DOCKERFILE_PATH: webservice/
@@ -40,31 +40,15 @@ jobs:
           docker build \
             --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest" \
             $DOCKERFILE_PATH
-          docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest"
 
-      - name: 'Docker build and push - grafana'
-        env:
-          IMAGE: grafana
-          DOCKERFILE_PATH: deployment/grafana_deployment/
+      - name: 'Docker push - ml-webservice'
         run: |
-          docker build \
-            --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest" \
-            $DOCKERFILE_PATH
-          docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest"
+          docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/ml-webservice:latest"
 
-      - name: 'Docker build and push - prometheus'
-        env:
-          IMAGE: prometheus
-          DOCKERFILE_PATH: deployment/prometheus_deployment/
-        run: |
-          docker build \
-            --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest" \
-            $DOCKERFILE_PATH
-          docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest"
-
-  auth:
-    name: Authenticate to Google Cloud
+  login-build-push-grafana:
+    name: Docker login, build, and push - grafana
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -74,3 +58,57 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
           token_format: 'access_token'
+
+      - uses: 'docker/login-action@v1'
+        name: 'Docker login'
+        with:
+          registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+
+      - name: 'Docker build - grafana'
+        env:
+          IMAGE: grafana
+          DOCKERFILE_PATH: deployment/grafana_deployment/
+        run: |
+          docker build \
+            --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest" \
+            $DOCKERFILE_PATH
+
+      - name: 'Docker push - grafana'
+        run: |
+          docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/grafana:latest"
+
+  login-build-push-prometheus:
+    name: Docker login, build, and push - prometheus
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
+          token_format: 'access_token'
+
+      - uses: 'docker/login-action@v1'
+        name: 'Docker login'
+        with:
+          registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+
+      - name: 'Docker build - prometheus'
+        env:
+          IMAGE: prometheus
+          DOCKERFILE_PATH: deployment/prometheus_deployment/
+        run: |
+          docker build \
+            --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest" \
+            $DOCKERFILE_PATH
+
+      - name: 'Docker push - prometheus'
+        run: |
+          docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/prometheus:latest"
