@@ -119,10 +119,7 @@ jobs:
             username: 'oauth2accesstoken'
             password: '${{ steps.auth.outputs.access_token }}'
 
-        - name: 'Copy prometheus.yml template'
-          run: |
-
-            cp deployment/prometheus_deployment/prometheus/prometheus.yml.template deployment/prometheus_deployment/prometheus/prometheus.yml
+       
 
         - name: 'Replace INTERNAL_IP in prometheus.yml'
           id: replace_internal_ip
