@@ -1,14 +1,15 @@
-import os
 import argparse
-import base64
-import pandas as pd
+
+# import base64
+import os
+
 import mlflow
-from sklearn.model_selection import train_test_split
+import pandas as pd
+import xgboost as xgb
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
-import xgboost as xgb
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -35,7 +36,7 @@ features = ["PULocationID", "DOLocationID", "trip_distance"]
 target = "duration"
 model_name = "green-taxi-trip-duration-xgb"
 
-df = pd.read_parquet(f"data/green_tripdata_2021-01.parquet")
+df = pd.read_parquet("data/green_tripdata_2021-01.parquet")
 
 
 def calculate_trip_duration_in_minutes(df):

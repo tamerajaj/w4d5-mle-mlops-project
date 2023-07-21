@@ -6,6 +6,7 @@ import os
 
 import mlflow
 import pandas as pd
+from dotenv import load_dotenv
 from mlflow.tracking.client import MlflowClient
 from rich import print
 from sklearn.linear_model import LinearRegression
@@ -13,10 +14,6 @@ from sklearn.linear_model import LinearRegression
 # import randomforest regressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-
-GOOGLE_APPLICATION_CREDENTIALS = "./credentials.json"
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GOOGLE_APPLICATION_CREDENTIALS
 
 
 def download_data(year=2021, month=2, color="green"):
@@ -29,6 +26,10 @@ def download_data(year=2021, month=2, color="green"):
         )
     print(f"Data for {color} taxi in {year}-{month:02d} is ready")
 
+
+load_dotenv()
+
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 client = MlflowClient(tracking_uri=MLFLOW_TRACKING_URI)
@@ -73,8 +74,10 @@ def preprocess(df):
 
 def train_model(df):
     print("Training the model")
-
+    load_dotenv()
     X_train, X_test, y_train, y_test = preprocess(df)
+    SA_KEY = os.getenv("SA_KEY")
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = SA_KEY
 
     with mlflow.start_run():
         tags = {
