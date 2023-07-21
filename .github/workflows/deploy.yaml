@@ -101,8 +101,7 @@ jobs:
         - name: Debug File Structure
           run: ls -la
 
-        - name: Debug Template File
-          run: cat deployment/prometheus_deployment/prometheus/prometheus.yml.template
+
         
 
         - name: 'Authenticate to Google Cloud'
