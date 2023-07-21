@@ -162,3 +162,5 @@ cython_debug/
 /mlartifacts/
 01-train-ml-model.ipynb
 settings.cfg
+docker-compose.yml
+send_data.py
