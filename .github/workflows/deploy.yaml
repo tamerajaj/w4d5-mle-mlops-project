@@ -93,6 +93,9 @@ jobs:
         INTERNAL_IP: ${{ secrets.INTERNAL_IP }}
 
       steps:
+
+        - name: Checkout
+          uses: actions/checkout@v3
         - name: 'Print Current Path'
           run: pwd
         - name: Debug File Structure
@@ -101,9 +104,6 @@ jobs:
         - name: Debug Template File
           run: cat deployment/prometheus_deployment/prometheus/prometheus.yml.template
         
-
-        - name: Checkout
-          uses: actions/checkout@v3
 
         - name: 'Authenticate to Google Cloud'
           id: auth
