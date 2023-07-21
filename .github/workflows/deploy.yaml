@@ -96,7 +96,7 @@ jobs:
         - name: 'Print Current Path'
           run: pwd
         - name: Debug File Structure
-          run: ls -R deployment/
+          run: ls -la
 
         - name: Debug Template File
           run: cat deployment/prometheus_deployment/prometheus/prometheus.yml.template
