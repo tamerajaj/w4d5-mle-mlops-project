@@ -93,7 +93,8 @@ jobs:
         INTERNAL_IP: ${{ secrets.INTERNAL_IP }}
 
       steps:
-
+        - name: 'Print Current Path'
+          run: pwd
         - name: Debug File Structure
           run: ls -R deployment/
 
