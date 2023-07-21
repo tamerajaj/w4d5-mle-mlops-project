@@ -27,9 +27,15 @@ fi
 # Rest of the script remains the same...
 
 
-sudo docker stop $(sudo docker ps -aq) # Stop all running Docker containers
+sudo docker stop ml-service
+sudo docker stop grafana
+sudo docker stop evidently_service
+sudo docker stop prometheus
 
-sudo docker rm $(sudo docker ps -aq) # Remove all Docker containers
+sudo docker rm ml-service
+sudo docker rm grafana
+sudo docker rm evidently_service
+sudo docker rm prometheus
 
 ## Remove all Docker images
 #docker rmi $(docker images -aq)
