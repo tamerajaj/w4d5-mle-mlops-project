@@ -9,6 +9,28 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: iterative/setup-cml@v1
+      - name: Install DVC
+        run: |
+          pip install dvc
+      - name: Check if DVC is initialized
+        id: check_dvc_init
+        run: |
+          if [ ! -d ".dvc" ]; then
+            echo "DVC not initialized"
+            echo "::set-output name=dvc_initialized::false"
+          else
+            echo "DVC is already initialized"
+            echo "::set-output name=dvc_initialized::true"
+          fi
+        continue-on-error: true
+      - name: Set up DVC and myremote
+        run: |
+          if [ -z "${{ secrets.BUCKET_NAME }}" ]; then
+            echo "Error: BUCKET_NAME environment variable not set."
+            exit 1
+          fi
+          dvc remote add -f -d myremote gs://${{ secrets.BUCKET_NAME }}/
+          dvc remote modify --local myremote credentialpath './credentials.json'
       - name: Train model
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
@@ -18,12 +40,9 @@ jobs:
           echo "$GOOGLE_APPLICATION_CREDENTIALS" | base64 --decode | jq > credentials.json
           pip install -r requirements.txt
           echo "Pulling data from GCS..."
-          dvc remote modify --local myremote \
-                    credentialpath './credentials.json'
           dvc pull
           echo "Training model..."
           python src/train.py --cml_run
           cat metrics.txt >> report.md
-          echo '![](./residuals.png "Residual Plot")' >> report.md
           cml comment create report.md 
           rm credentials.json
