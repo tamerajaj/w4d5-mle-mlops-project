@@ -11,5 +11,5 @@ scrape_configs:
     static_configs:
       - targets:
           - prometheus:9090
-          - ${INTERNAL_IP}:8080
+          - INTERNAL_IP:8080
           - 'evidently_service:8085'
