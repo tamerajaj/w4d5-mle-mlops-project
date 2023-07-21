@@ -123,7 +123,7 @@ jobs:
         - name: 'Replace INTERNAL_IP in prometheus.yml'
           id: replace_internal_ip
           run: | 
-            sed -i 'deployment/prometheus_deployment/prometheus/prometheus.yml' -e 's/INTERNAL_IP/$INTERNAL_IP/' 'deployment/prometheus_deployment/prometheus/prometheus.yml' 
+            sed -i 'deployment/prometheus_deployment/prometheus/prometheus.yml' -e 's/INTERNAL_IP/'"$INTERNAL_IP"'/' 'deployment/prometheus_deployment/prometheus/prometheus.yml' 
             cat deployment/prometheus_deployment/prometheus/prometheus.yml
 
 
