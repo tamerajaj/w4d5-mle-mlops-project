@@ -1,10 +1,12 @@
 name: CML
-on: 
-    pull_request:
-        branches: 
-            - main
+
+on:
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  train-and-report:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,7 +33,14 @@ jobs:
           fi
           dvc remote add -f -d myremote gs://${{ secrets.BUCKET_NAME }}/
           dvc remote modify --local myremote credentialpath './credentials.json'
-      - name: Train model
+
+  train_and_report:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up environment
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
@@ -39,10 +48,17 @@ jobs:
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS" | base64 --decode | jq > credentials.json
           pip install -r requirements.txt
-          echo "Pulling data from GCS..."
+      - name: Pull data from GCS
+        if: needs.setup.outputs.dvc_initialized == 'true'
+        run: |
           dvc pull
-          echo "Training model..."
+      - name: Train model
+        if: needs.setup.outputs.dvc_initialized == 'true'
+        run: |
           python src/train.py --cml_run
+      - name: Update report and comment
+        if: needs.setup.outputs.dvc_initialized == 'true'
+        run: |
           cat metrics.txt >> report.md
-          cml comment create report.md 
+          cml comment create report.md
           rm credentials.json
