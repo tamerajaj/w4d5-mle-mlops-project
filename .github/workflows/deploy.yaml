@@ -123,11 +123,12 @@ jobs:
           run: |
 
             cp deployment/prometheus_deployment/prometheus/prometheus.yml.template deployment/prometheus_deployment/prometheus/prometheus.yml
-        - name: Debug Yml File
-          run: cat deployment/prometheus_deployment/prometheus/prometheus.yml
+
         - name: 'Replace INTERNAL_IP in prometheus.yml'
           id: replace_internal_ip
-          run: sed -i 'deployment/prometheus_deployment/prometheus/prometheus.yml' -e 's/INTERNAL_IP/$INTERNAL_IP/' 'deployment/prometheus_deployment/prometheus/prometheus.yml'
+          run: | 
+            sed -i 'deployment/prometheus_deployment/prometheus/prometheus.yml' -e 's/INTERNAL_IP/$INTERNAL_IP/' 'deployment/prometheus_deployment/prometheus/prometheus.yml' 
+            cat deployment/prometheus_deployment/prometheus/prometheus.yml
 
 
 
