@@ -108,11 +108,11 @@ jobs:
 
         - name: 'Copy prometheus.yml template'
           run: |
-            cp deployment/prometheus_deployment/prometheus.yml.template deployment/prometheus_deployment/prometheus.yml
+            cp deployment/prometheus_deployment/prometheus/prometheus.yml.template deployment/prometheus_deployment/prometheus/prometheus.yml
 
         - name: 'Replace INTERNAL_IP in prometheus.yml'
           run: |
-            sed -i '' -e "s/INTERNAL_IP/$INTERNAL_IP/" deployment/prometheus_deployment/prometheus.yml
+            sed -i '' -e "s/INTERNAL_IP/$INTERNAL_IP/" deployment/prometheus_deployment/prometheus/prometheus.yml
 
         - name: 'Docker build - prometheus'
           env:
@@ -129,4 +129,4 @@ jobs:
 
         - name: 'Remove modified prometheus.yml'
           run: |
-            rm deployment/prometheus_deployment/prometheus.yml
+            rm deployment/prometheus_deployment/prometheus/prometheus.yml
