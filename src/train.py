@@ -136,5 +136,5 @@ if __name__ == "__main__":
     rmse_train, rmse_test = train_model(df)
     if cml_run:
         with open("metrics.txt", "w") as f:
-            f.write(f"RMSE on the Train Set: {rmse_train}")
-            f.write(f"RMSE on the Test Set: {rmse_test}")
+            f.write(f"RMSE on the Train Set: {rmse_train:.3f}")
+            f.write(f"RMSE on the Test Set: {rmse_test:.3f}")
