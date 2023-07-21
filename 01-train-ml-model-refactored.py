@@ -17,11 +17,13 @@ from sklearn.model_selection import train_test_split
 
 def download_data(year=2021, month=2, color="green"):
     # Download the data
-    print(f"Downloading {color} taxi data for {year}-{month:02d}")
+
     if not os.path.exists(f"./data/{color}_tripdata_{year}-{month:02d}.parquet"):
+        print(f"Downloading {color} taxi data for {year}-{month:02d}")
         os.system(
             f"wget -P ./data https://d37ci6vzurychx.cloudfront.net/trip-data/{color}_tripdata_{year}-{month:02d}.parquet"
         )
+    print(f"Data for {color} taxi in {year}-{month:02d} is ready")
 
 
 load_dotenv()
@@ -46,6 +48,7 @@ target = "duration"
 
 # calculate the trip duration in minutes and drop trips that are less than 1 minute and more than 2 hours
 def calculate_trip_duration_in_minutes(df):
+    print("Calculating trip duration in minutes")
     df["duration"] = (
         df["lpep_dropoff_datetime"] - df["lpep_pickup_datetime"]
     ).dt.total_seconds() / 60
@@ -56,6 +59,7 @@ def calculate_trip_duration_in_minutes(df):
 
 
 def preprocess(df):
+    print("Preprocessing the data")
     df_processed = calculate_trip_duration_in_minutes(df)
 
     y = df_processed["duration"]
@@ -68,6 +72,7 @@ def preprocess(df):
 
 
 def train_model(df):
+    print("Training the model")
     load_dotenv()
     X_train, X_test, y_train, y_test = preprocess(df)
     SA_KEY = os.getenv("SA_KEY")
@@ -87,9 +92,11 @@ def train_model(df):
 
         lr = LinearRegression()
         lr.fit(X_train, y_train)
+        print("Model training completed")
 
         y_pred = lr.predict(X_test)
         rmse = mean_squared_error(y_test, y_pred, squared=False)
+        print(f"RMSE: {rmse:.2f}")
         mlflow.log_metric("rmse", rmse)
 
         mlflow.sklearn.log_model(lr, "model")
@@ -98,7 +105,7 @@ def train_model(df):
         model_uri = f"runs:/{run_id}/model"
         model_name = "green-taxi-ride-duration"
         mlflow.register_model(model_uri=model_uri, name=model_name)
-
+        print(f"Model saved as {model_name}")
         model_version = 1
         new_stage = "Production"
         client.transition_model_version_stage(
@@ -110,7 +117,6 @@ def train_model(df):
 
 
 if __name__ == "__main__":
-    print("Here")
     year = 2021
     month = 2
     color = "green"
