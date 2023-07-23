@@ -2,7 +2,21 @@
 
 ## Summary:
 This MLOps project showcases a structured workflow for model training, deployment, and monitoring using GitHub Actions, Docker, and Google Cloud Platform. The model is deployed using FastAPI and monitored using Prometheus, Evidently, and Grafana.
-
+## Index
+1. [Summary](#summary)
+2. [Structure](#structure)
+   1. [Refactoring](#refactoring)
+   2. [Model training](#model-training)
+   3. [Model serving](#model-serving)
+   4. [Model monitoring](#model-monitoring)
+   5. [Monitoring services deployment](#monitoring-services-deployment)
+   6. [Running the Dockerized services](#running-the-dockerized-services)
+   7. [Environment variables](#environment-variables)
+   8. [Sending data to the model](#sending-data-to-the-model)
+   9. [Services Links](#services-links)
+3. [Environment](#environment)
+4. [Prerequisites on GCP](#prerequisites-on-gcp)
+5. [Pre-commit hooks](#pre-commit-hooks)
 ## Structure:
 
 ### 1. Refactoring:
@@ -44,7 +58,7 @@ The GitHub actions use the following environment variables:
 ### 8. Sending data to the model:
 You can send data to the model using the [send_data.py](send_data.py) script. The script sends the data to the model using the FastAPI service. You need to add the external IP of the VM instance to the script.
 
-### 9. Links:
+### 9. Services Links:
 If everything is deployed correctly, you can access the following services:
 * MLflow tracking server: ```<mlflow-ip>:5000```
 * FastAPI service: ```<monitoring-ip>:8080```
